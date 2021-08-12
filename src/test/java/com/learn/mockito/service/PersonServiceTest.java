@@ -2,8 +2,7 @@ package com.learn.mockito.service;
 
 import com.learn.mockito.dao.PersonDao;
 import com.learn.mockito.dto.Person;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -27,6 +26,19 @@ public class PersonServiceTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         personService = new PersonService(personDao);
+    }
+    @BeforeClass
+    public static void setUpClass() {
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+    }
+
+
+
+    @After
+    public void tearDown() {
     }
 
 
@@ -58,5 +70,20 @@ public class PersonServiceTest {
         //检查模拟对象是否还有未验证的交互
         verifyNoMoreInteractions(personDao);
         validateMockitoUsage();
+    }
+    @Test
+    public void shouldNotUpdateIfPersonNotFound(){
+        //设置模拟对象的返回预期值
+        when(personDao.fetchPerson(1)).thenReturn(null);
+
+        //执行测试
+        boolean updated = personService.update(1,"David");
+        //验证更新是否失败
+        assertFalse(updated);
+        // 验证模拟对象的fetchPerson(1)方法是否被调用了一次
+        verify(personDao).fetchPerson(1);
+        // 检查模拟对象上是否还有未验证的交互
+        verifyNoMoreInteractions(personDao);
+
     }
 }
